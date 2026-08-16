@@ -1,0 +1,10 @@
+{
+  "name": "Remix Receipt Scanner \u0026 Inventory Tracker",
+  "description": "Scan physical receipts using device camera, extract item details with AI OCR, and log inventory data into Google Sheets.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

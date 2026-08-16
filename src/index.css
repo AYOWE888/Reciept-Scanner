@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+body {
+  background-color: #090A0F;
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.display-num {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #090A0F;
+}
+::-webkit-scrollbar-thumb {
+  background: #2C2D38;
+}
+
+.hard-shadow {
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.hard-shadow-sm {
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.hard-shadow-emerald {
+  box-shadow: 4px 4px 0px 0px #10FF4F;
+}
+
+.brutalist-btn {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.brutalist-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.scan-wave {
+  background-image: repeating-linear-gradient(90deg, #10FF4F 0 1px, transparent 1px 4px);
+  opacity: 0.15;
+}
+
+@keyframes scanLine {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+
+.animate-scan-line {
+  animation: scanLine 2s ease-in-out infinite;
+}
+
