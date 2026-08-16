@@ -1,20 +1,37 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Receipt-Scanner (STOCKSCAN) 🧾
 
-# Run and deploy your AI Studio app
+An AI-powered receipt processing and inventory management app. Extract itemized data from physical receipt images using Gemini OCR and sync the details directly to local CSV files or a live Google Sheet.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/5320c66f-d0fb-4964-9207-952151806aec
+## ✨ Key Features
 
-## Run Locally
+* **AI-Powered OCR Parsing:** Uses Gemini's vision capabilities to read receipts, itemize purchases, and capture dates, prices, and totals.
+* **Google Live Sheet Sync:** Automatically appends parsed receipt items to a designated Google Sheet in real time.
+* **CSV Export:** Option to download or save parsed inventory lists locally as `.csv` files.
+* **Inventory Tracking:** Helps small businesses or personal users seamlessly transition purchase records into structured inventory records.
 
-**Prerequisites:**  Node.js
+---
 
+## 🛠️ Tech Stack
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+* **Frontend:** React, TypeScript, Vite
+* **Backend / Server:** Node.js, Express / TypeScript (`server.ts`)
+* **AI Core:** Google AI Studio (Gemini API)
+* **Storage / Sync:** Firebase Configuration, Google Sheets API, Local CSV parser
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+* Node.js (v18 or higher recommended)
+* Bun or npm
+* A Gemini API Key from [Google AI Studio](https://aistudio.google.com/)
+
+### Installation & Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/AYOWE888/Reciept-Scanner.git](https://github.com/AYOWE888/Reciept-Scanner.git)
+   cd Reciept-Scanner
