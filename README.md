@@ -4,7 +4,7 @@ An AI-powered receipt processing and inventory management app. Extract itemized 
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 * **AI-Powered OCR Parsing:** Uses Gemini's vision capabilities to read receipts, itemize purchases, and capture dates, prices, and totals.
 * **Google Live Sheet Sync:** Automatically appends parsed receipt items to a designated Google Sheet in real time.
