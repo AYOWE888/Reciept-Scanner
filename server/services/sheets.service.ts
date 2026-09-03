@@ -223,4 +223,42 @@ export class SheetsService {
 
     return { sheetId, spreadsheetUrl };
   }
+
+  /**
+   * List recent Google Sheets created by the user or accessible to the app.
+   */
+  public static async listInventorySheets(accessToken: string | null) {
+    const driveClient = await this.getDriveClient(accessToken);
+    if (!driveClient) {
+      throw new Error('Google Drive credentials missing or unauthenticated.');
+    }
+    
+    const response = await driveClient.files.list({
+      q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
+      orderBy: "modifiedTime desc",
+      pageSize: 50,
+      fields: "files(id, name, modifiedTime, webViewLink)",
+    });
+
+    return response.data.files || [];
+  }
+
+  /**
+   * Delete a spreadsheet (moves it to the trash).
+   */
+  public static async deleteSheet(accessToken: string | null, fileId: string) {
+    const driveClient = await this.getDriveClient(accessToken);
+    if (!driveClient) {
+      throw new Error('Google Drive credentials missing or unauthenticated.');
+    }
+
+    await driveClient.files.update({
+      fileId,
+      requestBody: {
+        trashed: true,
+      },
+    });
+    
+    return true;
+  }
 }

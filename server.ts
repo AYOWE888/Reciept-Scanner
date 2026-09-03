@@ -1,4 +1,9 @@
-import { startServer } from './server/index';
+import app, { startServer } from './server/index';
 
-// Boot the modular Express backend
-startServer();
+if (!process.env.VERCEL) {
+  // Boot the modular Express backend locally or on a standard VPS
+  startServer();
+}
+
+// Export for Vercel Serverless Function
+export default app;

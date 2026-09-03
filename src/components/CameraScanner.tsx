@@ -41,10 +41,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ onScanComplete }) 
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(mediaStream);
       setIsCameraActive(true);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
     } catch (err: any) {
       console.warn('Camera access error:', err);
       setCameraPermissionDenied(true);
@@ -52,6 +48,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({ onScanComplete }) 
       setIsCameraActive(false);
     }
   };
+
+  // Attach stream to video element when it becomes available
+  useEffect(() => {
+    if (isCameraActive && videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(e => console.warn('Video play error:', e));
+    }
+  }, [isCameraActive, stream]);
 
   // Stop camera when unmounted
   const stopCamera = () => {

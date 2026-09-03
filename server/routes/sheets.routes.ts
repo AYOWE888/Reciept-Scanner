@@ -141,6 +141,37 @@ router.post('/create-sheet', async (req: Request, res: Response) => {
   }
 });
 
+// GET /api/sheets/list
+router.get('/list', async (req: Request, res: Response) => {
+  try {
+    const accessToken = getAccessTokenFromReq(req);
+    const files = await SheetsService.listInventorySheets(accessToken);
+    res.json({ success: true, files });
+  } catch (error: any) {
+    console.error('Error listing Google Sheets:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to list Google Sheets' });
+  }
+});
+
+// DELETE /api/sheets/:sheetId
+router.delete('/:sheetId', async (req: Request, res: Response) => {
+  try {
+    const accessToken = getAccessTokenFromReq(req);
+    const { sheetId } = req.params;
+    await SheetsService.deleteSheet(accessToken, sheetId);
+    
+    // If the active sheet was deleted, clear it
+    if (activeSheetId === sheetId) {
+      activeSheetId = '';
+    }
+    
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('Error deleting Google Sheet:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to delete Google Sheet' });
+  }
+});
+
 // GET /api/sheets/status
 router.get('/status', (req: Request, res: Response) => {
   const summary = DbService.getInventorySummary();

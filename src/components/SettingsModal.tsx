@@ -29,6 +29,53 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [creationMsg, setCreationMsg] = useState<string | null>(null);
   const [createdSheetUrl, setCreatedSheetUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [mySheets, setMySheets] = useState<any[]>([]);
+  const [isLoadingSheets, setIsLoadingSheets] = useState(false);
+
+  React.useEffect(() => {
+    if (currentUser?.accessToken && isOpen) {
+      loadSheets();
+    }
+  }, [currentUser, isOpen]);
+
+  const loadSheets = async () => {
+    setIsLoadingSheets(true);
+    try {
+      const response = await fetch('/api/sheets/list', {
+        headers: { 'Authorization': `Bearer ${currentUser?.accessToken}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setMySheets(data.files);
+      }
+    } catch (e) {
+      console.error('Error loading sheets:', e);
+    } finally {
+      setIsLoadingSheets(false);
+    }
+  };
+
+  const handleDeleteSheet = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this sheet? It will be moved to your Google Drive trash.')) return;
+    try {
+      const response = await fetch(`/api/sheets/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${currentUser?.accessToken}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setMySheets(prev => prev.filter(s => s.id !== id));
+        if (inputSheetId === id) {
+          setInputSheetId('');
+          onUpdateSheetConfig('', 'Inventory');
+        }
+      } else {
+        setErrorMsg(data.error || 'Failed to delete sheet.');
+      }
+    } catch (e: any) {
+      setErrorMsg(e.message || 'Error deleting sheet.');
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -74,6 +121,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       onUpdateSheetConfig(result.sheetId, 'Inventory');
       setCreationMsg('Google Sheet created successfully in your Google Drive!');
       setCreatedSheetUrl(newSheetUrl);
+
+      // Refresh sheets list
+      loadSheets();
 
       // Automatically open the new sheet in a new browser tab
       window.open(newSheetUrl, '_blank', 'noopener,noreferrer');
@@ -165,6 +215,55 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {isCreatingSheet ? 'Creating Google Sheet...' : 'Create Inventory Sheet in Google Drive'}
           </button>
         </div>
+
+        {/* Your Google Sheets List */}
+        {currentUser && (
+          <div className="bg-[#090A0F] border border-[#2C2D38] p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-mono uppercase tracking-wider text-white font-bold flex items-center gap-2">
+                <i className="ph ph-list text-base text-[#10FF4F]"></i> Your Inventory Sheets
+              </div>
+              <button onClick={loadSheets} disabled={isLoadingSheets} className="text-[#8A8B99] hover:text-white cursor-pointer" title="Refresh list">
+                <i className={`ph ph-arrows-clockwise ${isLoadingSheets ? 'animate-spin' : ''}`}></i>
+              </button>
+            </div>
+            
+            {mySheets.length === 0 && !isLoadingSheets ? (
+              <p className="text-[10px] text-[#8A8B99] font-mono italic">No inventory sheets found in your Google Drive.</p>
+            ) : (
+              <div className="space-y-2 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
+                {mySheets.map((sheet) => (
+                  <div key={sheet.id} className={`flex items-center justify-between p-2 text-xs font-mono border ${inputSheetId === sheet.id ? 'border-[#10FF4F] bg-[#10FF4F]/5' : 'border-[#2C2D38] bg-black'} `}>
+                    <div className="truncate flex-1" title={sheet.name}>{sheet.name}</div>
+                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                      {inputSheetId !== sheet.id && (
+                        <button 
+                          onClick={() => {
+                            setInputSheetId(sheet.id);
+                            onUpdateSheetConfig(sheet.id, inputSheetTabName);
+                          }}
+                          className="text-[#10FF4F] hover:underline cursor-pointer"
+                        >
+                          Select
+                        </button>
+                      )}
+                      {inputSheetId === sheet.id && (
+                        <span className="text-[#10FF4F] bg-[#10FF4F]/10 px-1 text-[10px] uppercase">Active</span>
+                      )}
+                      <button 
+                        onClick={() => handleDeleteSheet(sheet.id)}
+                        className="text-red-400 hover:text-red-300 ml-2 cursor-pointer"
+                        title="Delete Sheet"
+                      >
+                        <i className="ph ph-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Feedback Alerts */}
         {creationMsg && (
