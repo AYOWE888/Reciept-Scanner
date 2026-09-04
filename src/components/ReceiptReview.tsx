@@ -197,6 +197,19 @@ export const ReceiptReview: React.FC<ReceiptReviewProps> = ({
             <Plus className="w-4 h-4" />
             <span>SCAN ANOTHER</span>
           </button>
+          
+          {sheetId && (
+            <a
+              href={`https://docs.google.com/spreadsheets/d/${sheetId}/edit`}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center space-x-2 bg-[#10FF4F]/20 hover:bg-[#10FF4F]/30 text-[#10FF4F] border border-[#10FF4F]/50 px-4 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              title="Open the live Google Sheet in a new tab"
+            >
+              <ExternalLink className="w-4 h-4 text-[#10FF4F]" />
+              <span>OPEN SHEET</span>
+            </a>
+          )}
         </div>
       </div>
 
