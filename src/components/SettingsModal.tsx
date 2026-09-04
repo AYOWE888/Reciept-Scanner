@@ -250,6 +250,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       {inputSheetId === sheet.id && (
                         <span className="text-[#10FF4F] bg-[#10FF4F]/10 px-1 text-[10px] uppercase">Active</span>
                       )}
+                      {sheet.webViewLink && (
+                        <a 
+                          href={sheet.webViewLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-white hover:text-[#10FF4F] ml-2 cursor-pointer flex items-center"
+                          title="Open Sheet"
+                        >
+                          <i className="ph ph-arrow-square-out"></i>
+                        </a>
+                      )}
                       <button 
                         onClick={() => handleDeleteSheet(sheet.id)}
                         className="text-red-400 hover:text-red-300 ml-2 cursor-pointer"

@@ -158,7 +158,7 @@ export default function App() {
   };
 
   // When a new receipt scan completes via Gemini OCR
-  const handleScanComplete = (newScan: ReceiptData) => {
+  const handleScanComplete = async (newScan: ReceiptData) => {
     const activeUserId = currentUser?.email || 'guest_user';
     const taggedScan: ReceiptData = {
       ...newScan,
@@ -167,6 +167,16 @@ export default function App() {
     };
     setScans((prev) => [taggedScan, ...prev]);
     setActiveTab('dashboard');
+    
+    // Automatically save to Google Sheets if a sheet is configured
+    if (sheetId) {
+      try {
+        await handleApproveScan(taggedScan);
+        console.log('Automatically saved to Google Sheets');
+      } catch (err) {
+        console.error('Auto-save to Google Sheets failed:', err);
+      }
+    }
   };
 
   // Delete a receipt and its line items from user state
