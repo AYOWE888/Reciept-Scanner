@@ -10,9 +10,10 @@ interface Message {
 
 interface AiAssistantProps {
   currentUser?: UserProfile | null;
+  scans?: any[];
 }
 
-export const AiAssistant: React.FC<AiAssistantProps> = ({ currentUser }) => {
+export const AiAssistant: React.FC<AiAssistantProps> = ({ currentUser, scans = [] }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome-1',
@@ -59,6 +60,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ currentUser }) => {
           message: query,
           history: messages.map((m) => ({ sender: m.sender, text: m.text })),
           userId: currentUser?.email || undefined,
+          scans,
         }),
       });
 

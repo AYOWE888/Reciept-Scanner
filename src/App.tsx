@@ -354,7 +354,9 @@ export default function App() {
                 onSelectReceipt={handleSelectReceiptById}
               />
             ) : activeTab === 'chat' ? (
-              <AiAssistant currentUser={currentUser} />
+              <div className="lg:col-span-1">
+                <AiAssistant currentUser={currentUser} scans={scans} />
+              </div>
             ) : (
               <>
                 {/* Mobile Header */}

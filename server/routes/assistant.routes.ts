@@ -21,14 +21,66 @@ function getGenAI(): GoogleGenAI {
 // POST /api/assistant/chat
 router.post('/chat', async (req: Request, res: Response) => {
   try {
-    const { message, history = [], userId } = req.body;
+    const { message, history = [], userId, scans = [] } = req.body;
 
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ success: false, error: 'Message text is required' });
     }
 
-    // Retrieve active inventory summary from SQLite database
-    const summary = DbService.getInventorySummary(userId);
+    // Retrieve active inventory summary from frontend state directly
+    const items = scans.flatMap((scan: any) => scan.items || []);
+    const totalItemsScanned = items.reduce((acc: number, i: any) => acc + (Number(i.quantity) || 1), 0);
+    const totalSpend = items.reduce((acc: number, i: any) => acc + (Number(i.totalPrice) || 0), 0);
+
+    const itemMap = new Map();
+    for (const item of items) {
+      const normalized = (item.itemName || '').toLowerCase().trim();
+      const existing = itemMap.get(normalized) || {
+        itemName: item.itemName,
+        normalizedName: normalized,
+        totalQuantity: 0,
+        totalSpend: 0,
+        categories: new Set(),
+        lastPurchased: item.date || '',
+        purchaseCount: 0,
+      };
+      existing.totalQuantity += Number(item.quantity) || 1;
+      existing.totalSpend += Number(item.totalPrice) || 0;
+      if (item.category) existing.categories.add(item.category);
+      existing.purchaseCount += 1;
+      itemMap.set(normalized, existing);
+    }
+
+    const catMap = new Map();
+    for (const item of items) {
+      const cat = item.category || 'General';
+      const existing = catMap.get(cat) || { category: cat, itemCount: 0, totalQuantity: 0, totalSpend: 0 };
+      existing.itemCount += 1;
+      existing.totalQuantity += Number(item.quantity) || 1;
+      existing.totalSpend += Number(item.totalPrice) || 0;
+      catMap.set(cat, existing);
+    }
+
+    const summary = {
+      totalItemsScanned,
+      uniqueItemCount: itemMap.size,
+      totalSpend: Number(totalSpend.toFixed(2)),
+      categoryBreakdown: Array.from(catMap.values()).map((c: any) => ({
+        ...c, totalSpend: Number(c.totalSpend.toFixed(2))
+      })),
+      aggregatedItems: Array.from(itemMap.values()).map((val: any) => ({
+        ...val, 
+        totalSpend: Number(val.totalSpend.toFixed(2)), 
+        categories: Array.from(val.categories)
+      })),
+      recentReceipts: scans.slice(0, 10).map((r: any) => ({
+        receiptId: r.receiptId,
+        merchant: r.merchantName,
+        date: r.date,
+        itemCount: (r.items || []).length,
+        totalAmount: Number(r.totalAmount),
+      })),
+    };
     const ai = getGenAI();
 
     const systemContext = `
